@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Book a Class | Lidiia</title>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="page-shell booking-page">
+
+    <header class="site-header">
+      <a href="index.html" class="brand-mark" aria-label="Back to home">
+        <img src="assets/moon.png" alt="" />
+      </a>
+
+      <nav class="nav" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="index.html#about">About</a>
+        <a href="index.html#practice">Practice</a>
+        <a href="booking.html" class="active">Book</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="booking-hero">
+        <div>
+          <p class="eyebrow">Practice with me</p>
+          <h1>Book a class</h1>
+          <p>
+            Choose one of the available dates below. After selecting a class,
+            send a booking request by email.
+          </p>
+        </div>
+
+        <img src="assets/card.png" alt="" />
+      </section>
+
+      <section class="booking-layout">
+        <div class="calendar-panel">
+          <div class="calendar-header">
+            <button type="button" id="prevMonth" aria-label="Previous month">←</button>
+            <h2 id="calendarTitle">Month Year</h2>
+            <button type="button" id="nextMonth" aria-label="Next month">→</button>
+          </div>
+
+          <div class="calendar-weekdays">
+            <span>Mon</span>
+            <span>Tue</span>
+            <span>Wed</span>
+            <span>Thu</span>
+            <span>Fri</span>
+            <span>Sat</span>
+            <span>Sun</span>
+          </div>
+
+          <div id="calendarGrid" class="calendar-grid"></div>
+        </div>
+
+        <aside class="booking-details">
+          <h2>Your booking request</h2>
+
+          <div id="selectedClassBox" class="selected-class-box">
+            <p>No class selected yet.</p>
+          </div>
+
+          <form id="bookingForm" class="booking-form">
+            <label>
+              Your name
+              <input type="text" id="bookingName" placeholder="Your name" required />
+            </label>
+
+            <label>
+              Your email
+              <input type="email" id="bookingEmail" placeholder="you@example.com" required />
+            </label>
+
+            <label>
+              Message
+              <textarea id="bookingMessage" rows="5" placeholder="Anything Lidiia should know?"></textarea>
+            </label>
+
+            <button type="submit" class="button booking-submit">
+              Send booking request →
+            </button>
+          </form>
+        </aside>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <a href="index.html">Home</a>
+      <a href="mailto:lidiia@example.com">Email</a>
+      <a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a>
+
+      <div class="footer-eye">
+        <img src="assets/eye.png" alt="" />
+      </div>
+
+      <span>© 2026 All rights reserved</span>
+    </footer>
+
+  </div>
+
+  <script src="booking.js"></script>
+</body>
+</html>
