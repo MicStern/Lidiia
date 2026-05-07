@@ -1,4 +1,10 @@
-const lidiiaEmail = "micahel.stern@hshl.de";
+const EMAILJS_PUBLIC_KEY = "u38C-5RmwIvM-RP_E";
+const EMAILJS_SERVICE_ID = "service_x3iwkqw";
+const EMAILJS_TEMPLATE_ID = "template_fiz1pbs";
+
+emailjs.init({
+  publicKey: EMAILJS_PUBLIC_KEY
+});
 
 const classes = [
   {
@@ -48,6 +54,7 @@ const bookingForm = document.getElementById("bookingForm");
 const bookingName = document.getElementById("bookingName");
 const bookingEmail = document.getElementById("bookingEmail");
 const bookingMessage = document.getElementById("bookingMessage");
+const bookingStatus = document.getElementById("bookingStatus");
 
 let selectedClass = null;
 
@@ -63,6 +70,20 @@ function formatDateKey(year, monthIndex, day) {
 
 function getClassesForDate(dateKey) {
   return classes.filter((classItem) => classItem.date === dateKey);
+}
+
+function formatReadableDate(dateKey) {
+  return new Date(`${dateKey}T12:00:00`).toLocaleDateString("en", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+
+function setStatus(message, type = "") {
+  bookingStatus.textContent = message;
+  bookingStatus.className = `booking-status ${type}`;
 }
 
 function renderCalendar() {
@@ -118,12 +139,10 @@ function renderCalendar() {
 }
 
 function showClassesForDate(dateKey, classesToday) {
-  const readableDate = new Date(`${dateKey}T12:00:00`).toLocaleDateString("en", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric"
-  });
+  const readableDate = formatReadableDate(dateKey);
+
+  selectedClass = null;
+  setStatus("");
 
   selectedClassBox.innerHTML = `
     <p class="selected-date">${readableDate}</p>
@@ -153,16 +172,16 @@ function showClassesForDate(dateKey, classesToday) {
       const selectedIndex = Number(button.dataset.index);
       selectedClass = classesToday[selectedIndex];
 
-      selectedClassBox.dataset.selectedDate = dateKey;
+      setStatus(`Selected: ${selectedClass.title} on ${formatReadableDate(selectedClass.date)} at ${selectedClass.time}.`);
     });
   });
 }
 
-bookingForm.addEventListener("submit", (event) => {
+bookingForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   if (!selectedClass) {
-    alert("Please select a class first.");
+    setStatus("Please select a class first.", "error");
     return;
   }
 
@@ -170,33 +189,60 @@ bookingForm.addEventListener("submit", (event) => {
   const email = bookingEmail.value.trim();
   const message = bookingMessage.value.trim();
 
-  const subject = `Booking request: ${selectedClass.title} on ${selectedClass.date}`;
+  if (!name || !email) {
+    setStatus("Please enter your name and email.", "error");
+    return;
+  }
 
-  const body = `
-Hi Lidiia,
+  const submitButton = bookingForm.querySelector(".booking-submit");
 
-I would like to book this class:
+  submitButton.disabled = true;
+  submitButton.textContent = "Sending...";
+  setStatus("Sending your booking request...", "");
 
-Class: ${selectedClass.title}
-Date: ${selectedClass.date}
-Time: ${selectedClass.time}
-Location: ${selectedClass.location}
+  const templateParams = {
+    student_name: name,
+    student_email: email,
+    message: message || "-",
+    class_title: selectedClass.title,
+    class_date: selectedClass.date,
+    class_date_readable: formatReadableDate(selectedClass.date),
+    class_time: selectedClass.time,
+    class_location: selectedClass.location,
+    class_spots: selectedClass.spots
+  };
 
-My name: ${name}
-My email: ${email}
+  try {
+    await emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_TEMPLATE_ID,
+      templateParams
+    );
 
-Message:
-${message || "-"}
+    selectedClassBox.innerHTML = `
+      <p class="selected-date">Booking request sent</p>
+      <p>
+        Thank you, ${name}. Your booking request for
+        <strong>${selectedClass.title}</strong> has been sent.
+        You should also receive a confirmation email.
+      </p>
+    `;
 
-Thank you!
-`;
+    bookingForm.reset();
+    selectedClass = null;
 
-  const mailtoUrl =
-    `mailto:${encodeURIComponent(lidiiaEmail)}` +
-    `?subject=${encodeURIComponent(subject)}` +
-    `&body=${encodeURIComponent(body)}`;
+    setStatus("Booking request sent successfully.", "success");
+  } catch (error) {
+    console.error("EmailJS error:", error);
 
-  window.location.href = mailtoUrl;
+    setStatus(
+      "Sorry, the booking request could not be sent. Please try again or contact Lidiia directly by email.",
+      "error"
+    );
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = "Send booking request →";
+  }
 });
 
 prevMonthButton.addEventListener("click", () => {
@@ -206,6 +252,10 @@ prevMonthButton.addEventListener("click", () => {
     visibleMonth = 11;
     visibleYear--;
   }
+
+  selectedClass = null;
+  selectedClassBox.innerHTML = "<p>No class selected yet.</p>";
+  setStatus("");
 
   renderCalendar();
 });
@@ -217,6 +267,10 @@ nextMonthButton.addEventListener("click", () => {
     visibleMonth = 0;
     visibleYear++;
   }
+
+  selectedClass = null;
+  selectedClassBox.innerHTML = "<p>No class selected yet.</p>";
+  setStatus("");
 
   renderCalendar();
 });

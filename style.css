@@ -1046,3 +1046,24 @@ a {
     display: none;
   }
 }
+
+.booking-status {
+  min-height: 20px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.booking-status.success {
+  color: #1e5b2b;
+}
+
+.booking-status.error {
+  color: #8f1d1d;
+}
+
+.booking-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
